@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
     Constants.errorSum += error * dt;
     //the rate that error is decreasing; a slope to adjust output
     double errorRate = (error - Constants.lastError)/ dt;
-    //the only thing that is to be changed is the constants kP, kI, kD, though some tweaking may be needed to my kConversion
+    //the only thing that is to be changed is the constants kP, kI, kD, though some tweaking may be needed to kConversion
     double mOutput = Constants.kP * error + Constants.kI * Constants.errorSum + Constants.kD * errorRate;
 
     //ouput to motor 
