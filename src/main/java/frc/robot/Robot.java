@@ -4,12 +4,15 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.driveTrain;
 
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
@@ -21,7 +24,10 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    SmartDashboard.putNumber("encoder ticks", driveTrain.backLeftMotor.getSelectedSensorPosition() * Constants.kConversion);
+    SmartDashboard.putNumber("setpoint", Constants.setpoint);
   }
+
 
   @Override
   public void disabledInit() {}
@@ -34,25 +40,44 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
+    //resets variable at the start
+    driveTrain.backLeftMotor.setSelectedSensorPosition(0);
+    Constants.lastTimeStamp = Timer.getFPGATimestamp();
+    Constants.lastError = 0;
+    Constants.errorRate = 0;
+
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    
+    Constants.currentPos = driveTrain.backLeftMotor.getSelectedSensorPosition() * Constants.kConversion;
+    //how far robot is from the "setpoint"
+    double error = Constants.setpoint - Constants.currentPos;
+
+    //dt = delta T, or in otherwords "change in Time" where delta is "change in", and T is "time"
+    double dt = Timer.getFPGATimestamp() - Constants.lastTimeStamp;
+    //accumaltion overtime to tweak the output by a tiny bit
+    Constants.errorSum += error * dt;
+    //the rate that error is decreasing; a slope to adjust output
+    double errorRate = (error - Constants.lastError)/ dt;
+    //the only thing that is to be changed is the constants kP, kI, kD, though some tweaking may be needed to my kConversion
+    double mOutput = Constants.kP * error + Constants.kI * Constants.errorSum + Constants.kD * errorRate;
+
+    //ouput to motor 
+    driveTrain.backLeftMotor.set(ControlMode.PercentOutput, mOutput);
+    //update variables
+  
+    Constants.lastTimeStamp = Timer.getFPGATimestamp();
+
+    Constants.lastError = error;}
 
   @Override
   public void autonomousExit() {}
 
   @Override
-  public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
-  }
+  public void teleopInit() {}
 
   @Override
   public void teleopPeriodic() {}
