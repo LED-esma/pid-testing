@@ -24,8 +24,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    SmartDashboard.putNumber("encoder ticks", driveTrain.backLeftMotor.getSelectedSensorPosition() * Constants.kConversion);
-    SmartDashboard.putNumber("setpoint", Constants.setpoint);
+    SmartDashboard.putNumber("encoder ticks", driveTrain.backLeftMotor.getSelectedSensorPosition() );
   }
 
 
@@ -51,8 +50,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
+    SmartDashboard.putNumber("encoder ticks", driveTrain.backLeftMotor.getSelectedSensorPosition() );
+    SmartDashboard.putNumber("setpoint", Constants.setpoint);
+    SmartDashboard.putNumber("currentpos", Constants.currentPos);
     
-    Constants.currentPos = driveTrain.backLeftMotor.getSelectedSensorPosition() * Constants.kConversion;
+    Constants.currentPos = driveTrain.backLeftMotor.getSelectedSensorPosition()/2048;
     //how far robot is from the "setpoint"
     double error = Constants.setpoint - Constants.currentPos;
 
