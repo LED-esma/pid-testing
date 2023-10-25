@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.driveTrain;
@@ -17,6 +18,10 @@ public class RobotContainer {
   public CommandJoystick  joy = new CommandJoystick(0);
   public RobotContainer() {
     configureBindings();
+
+    m_DriveTrain.setDefaultCommand(
+      new RunCommand(() -> m_DriveTrain.input(joy.getRawAxis(5)), m_DriveTrain)
+    );
   }
 
   private void configureBindings() {

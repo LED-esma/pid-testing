@@ -2,6 +2,7 @@ package frc.robot;
 
 public class Constants {
 
+    //constants
     public static final double kRatio = 10.71;
     public static final double kDiameter = 3;
     public static final double kP = 0.015;  
